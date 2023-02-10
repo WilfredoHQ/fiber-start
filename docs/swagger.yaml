@@ -1,0 +1,796 @@
+definitions:
+  Error:
+    properties:
+      detail:
+        enum:
+        - internal_server_error
+        - endpoint_not_found
+        - invalid_credentials
+        - invalid_jwt
+        - insufficient_privileges
+        - current_user_not_found
+        - current_user_inactive
+        - current_user_not_superuser
+        - user_already_registered
+        - user_not_found
+        - user_inactive
+        - follower_relation_already_registered
+        - follower_relation_not_found
+        - post_not_found
+        type: string
+    required:
+    - detail
+    type: object
+  FollowerRelation:
+    properties:
+      createdAt:
+        type: string
+      followedId:
+        type: string
+      followerId:
+        type: string
+      hasData:
+        type: boolean
+      id:
+        type: string
+      updatedAt:
+        type: string
+    required:
+    - createdAt
+    - followedId
+    - followerId
+    - hasData
+    - id
+    - updatedAt
+    type: object
+  FollowerRelationCreate:
+    properties:
+      followedId:
+        type: string
+    required:
+    - followedId
+    type: object
+  Msg:
+    properties:
+      msg:
+        enum:
+        - email_sent
+        - password_updated
+        - post_deleted
+        - follower_relation_deleted
+        type: string
+    required:
+    - msg
+    type: object
+  Post:
+    properties:
+      content:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: string
+      updatedAt:
+        type: string
+      user:
+        $ref: '#/definitions/PostUser'
+      userId:
+        type: string
+    required:
+    - content
+    - createdAt
+    - id
+    - updatedAt
+    - user
+    - userId
+    type: object
+  PostCreate:
+    properties:
+      content:
+        type: string
+    required:
+    - content
+    type: object
+  PostUpdate:
+    properties:
+      content:
+        type: string
+    type: object
+  PostUser:
+    properties:
+      avatarUrl:
+        type: string
+      fullName:
+        type: string
+    required:
+    - avatarUrl
+    - fullName
+    type: object
+  RecoverAccount:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
+  ResetPassword:
+    properties:
+      newPassword:
+        minLength: 8
+        type: string
+      token:
+        type: string
+    required:
+    - newPassword
+    - token
+    type: object
+  Token:
+    properties:
+      accessToken:
+        type: string
+      tokenType:
+        type: string
+    required:
+    - accessToken
+    - tokenType
+    type: object
+  User:
+    properties:
+      avatarUrl:
+        type: string
+      biography:
+        type: string
+      birthdate:
+        type: string
+      coverUrl:
+        type: string
+      createdAt:
+        type: string
+      email:
+        type: string
+      followersCount:
+        type: integer
+      followingCount:
+        type: integer
+      fullName:
+        type: string
+      gender:
+        type: string
+      id:
+        type: string
+      isActive:
+        type: boolean
+      isSuperuser:
+        type: boolean
+      location:
+        type: string
+      updatedAt:
+        type: string
+    required:
+    - avatarUrl
+    - biography
+    - birthdate
+    - coverUrl
+    - createdAt
+    - email
+    - followersCount
+    - followingCount
+    - fullName
+    - gender
+    - id
+    - isActive
+    - isSuperuser
+    - location
+    - updatedAt
+    type: object
+  UserCreate:
+    properties:
+      avatarUrl:
+        type: string
+      biography:
+        type: string
+      birthdate:
+        type: string
+      coverUrl:
+        type: string
+      email:
+        type: string
+      fullName:
+        minLength: 3
+        type: string
+      gender:
+        type: string
+      isActive:
+        type: boolean
+      isSuperuser:
+        type: boolean
+      location:
+        type: string
+      password:
+        minLength: 8
+        type: string
+    required:
+    - email
+    - fullName
+    - password
+    type: object
+  UserUpdate:
+    properties:
+      avatarUrl:
+        type: string
+      biography:
+        type: string
+      birthdate:
+        type: string
+      coverUrl:
+        type: string
+      fullName:
+        minLength: 3
+        type: string
+      gender:
+        type: string
+      isActive:
+        type: boolean
+      isSuperuser:
+        type: boolean
+      location:
+        type: string
+      password:
+        minLength: 8
+        type: string
+    type: object
+  ValidationError:
+    properties:
+      detail: {}
+    required:
+    - detail
+    type: object
+info:
+  contact: {}
+  title: Start
+  version: 0.1.0
+paths:
+  /api/v1/account/current:
+    get:
+      consumes:
+      - application/json
+      description: Get current account
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Current Account
+      tags:
+      - Account
+  /api/v1/account/login:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Login
+      parameters:
+      - description: Username
+        in: formData
+        name: username
+        required: true
+        type: string
+      - description: Password
+        in: formData
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Token'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Login
+      tags:
+      - Account
+  /api/v1/account/recover:
+    post:
+      consumes:
+      - application/json
+      description: Recover account
+      parameters:
+      - description: Body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/RecoverAccount'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Msg'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/ValidationError'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Recover Account
+      tags:
+      - Account
+  /api/v1/account/reset-password:
+    post:
+      consumes:
+      - application/json
+      description: Reset password
+      parameters:
+      - description: Body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/ResetPassword'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Msg'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/ValidationError'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Reset Password
+      tags:
+      - Account
+  /api/v1/follower-relations:
+    post:
+      consumes:
+      - application/json
+      description: Create follower relation
+      parameters:
+      - description: Body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/FollowerRelationCreate'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/FollowerRelation'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/ValidationError'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Follower Relation
+      tags:
+      - Follower relations
+  /api/v1/follower-relations/{follower_relation_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete follower relation
+      parameters:
+      - description: Follower relation id
+        in: path
+        name: follower_relation_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Msg'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Follower Relation
+      tags:
+      - Follower relations
+  /api/v1/follower-relations/following/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: Check follower relation
+      parameters:
+      - description: User id
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/FollowerRelation'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Check Follower Relation
+      tags:
+      - Follower relations
+  /api/v1/posts:
+    get:
+      consumes:
+      - application/json
+      description: Get posts
+      parameters:
+      - description: User id
+        in: query
+        name: userId
+        type: string
+      - description: Search
+        in: query
+        name: search
+        type: string
+      - default: 0
+        description: Skip
+        in: query
+        name: skip
+        type: integer
+      - default: 20
+        description: Limit
+        in: query
+        minimum: 1
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/Post'
+            type: array
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Posts
+      tags:
+      - Posts
+    post:
+      consumes:
+      - application/json
+      description: Create post
+      parameters:
+      - description: Body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/PostCreate'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/Post'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/ValidationError'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Post
+      tags:
+      - Posts
+  /api/v1/posts/{post_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete post
+      parameters:
+      - description: Post id
+        in: path
+        name: post_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Msg'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Post
+      tags:
+      - Posts
+    get:
+      consumes:
+      - application/json
+      description: Get post
+      parameters:
+      - description: Post id
+        in: path
+        name: post_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Post'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Post
+      tags:
+      - Posts
+    patch:
+      consumes:
+      - application/json
+      description: Update post
+      parameters:
+      - description: Post id
+        in: path
+        name: post_id
+        required: true
+        type: string
+      - description: Body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/PostUpdate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Post'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/ValidationError'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Post
+      tags:
+      - Posts
+  /api/v1/posts/home:
+    get:
+      consumes:
+      - application/json
+      description: Get home posts
+      parameters:
+      - description: Search
+        in: query
+        name: search
+        type: string
+      - default: 0
+        description: Skip
+        in: query
+        name: skip
+        type: integer
+      - default: 20
+        description: Limit
+        in: query
+        minimum: 1
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/Post'
+            type: array
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Home Posts
+      tags:
+      - Posts
+  /api/v1/users:
+    get:
+      consumes:
+      - application/json
+      description: Get users
+      parameters:
+      - description: Follower id
+        in: query
+        name: followerId
+        type: string
+      - description: Followed id
+        in: query
+        name: followedId
+        type: string
+      - description: Search
+        in: query
+        name: search
+        type: string
+      - default: 0
+        description: Skip
+        in: query
+        name: skip
+        type: integer
+      - default: 20
+        description: Limit
+        in: query
+        minimum: 1
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/User'
+            type: array
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Users
+      tags:
+      - Users
+    post:
+      consumes:
+      - application/json
+      description: Create user
+      parameters:
+      - description: Body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/UserCreate'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/User'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/ValidationError'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Create User
+      tags:
+      - Users
+  /api/v1/users/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get user
+      parameters:
+      - description: User id
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Get User
+      tags:
+      - Users
+    patch:
+      consumes:
+      - application/json
+      description: Update user
+      parameters:
+      - description: User id
+        in: path
+        name: user_id
+        required: true
+        type: string
+      - description: Body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/UserUpdate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/ValidationError'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Update User
+      tags:
+      - Users
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
